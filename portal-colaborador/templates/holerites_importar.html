@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% block titulo %}Importar holerites{% endblock %}
+{% block conteudo %}
+<h1>Importar holerites</h1>
+<p class="sub">Escolha o mês e o tipo e envie os PDFs (um por funcionário) ou um ZIP com todos. O funcionário é identificado pelo CPF, no nome do arquivo ou dentro do PDF, e o holerite aparece na lista dele. <a href="{% url 'admin:portal_holerite_changelist' %}">Voltar ao admin</a></p>
+<form method="post" enctype="multipart/form-data" class="filtros">
+  {% csrf_token %}
+  <input type="month" name="mes" value="{{ mes_padrao }}" required aria-label="Mês de referência">
+  <select name="tipo" aria-label="Tipo">
+    {% for valor, nome in tipos %}<option value="{{ valor }}">{{ nome }}</option>{% endfor %}
+  </select>
+  <input type="file" name="arquivos" accept=".pdf,.zip" multiple required aria-label="Arquivos PDF ou ZIP">
+  <button class="btn btn-primario">Importar</button>
+</form>
+{% if processado %}
+  <p class="aviso{% if falhas and not ok %} erro{% endif %}">{{ ok }} importado(s) para {{ competencia|date:"F \d\e Y" }}{% if falhas %}, {{ falhas }} com erro{% endif %}.</p>
+  <div class="cartao">
+    <table>
+      <thead><tr><th>Arquivo</th><th>Funcionário</th><th>Resultado</th><th>Detalhe</th></tr></thead>
+      <tbody>
+      {% for r in resultados %}
+        <tr>
+          <td>{{ r.arquivo }}</td>
+          <td>{% if r.ok %}{{ r.colab }}{% else %}-{% endif %}</td>
+          <td>{% if r.ok %}<span class="chip chip-ok">{{ r.detalhe }}</span>{% else %}<span class="chip chip-erro">Não importado</span>{% endif %}</td>
+          <td>{% if r.ok %}-{% else %}{{ r.detalhe }}{% endif %}</td>
+        </tr>
+      {% empty %}
+        <tr><td colspan="4" class="vazio">Nenhum PDF encontrado nos arquivos enviados.</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endif %}
+{% endblock %}

@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block conteudo %}
+<h1>Olá, {{ user.first_name|default:user.username }}</h1>
+<p class="sub">Matrícula {{ colab.matricula }}{% if colab.cargo %}, {{ colab.cargo }}{% endif %}</p>
+<div class="atalhos">
+  <a class="atalho" href="{% url 'holerites' %}">
+    <strong>Holerites</strong>
+    <span>{% if ultimo %}Último: {{ ultimo.competencia|date:"F \d\e Y" }} ({{ ultimo.get_tipo_display }}){% else %}Nenhum holerite publicado ainda.{% endif %}</span>
+  </a>
+  <a class="atalho" href="{% url 'ponto' %}?mes={{ mes_atual }}">
+    <strong>Espelho de ponto</strong>
+    <span>Batidas, horas extras e banco de horas</span>
+  </a>
+</div>
+{% endblock %}

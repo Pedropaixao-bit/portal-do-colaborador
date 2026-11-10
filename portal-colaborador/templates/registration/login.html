@@ -1,0 +1,26 @@
+{% extends "base.html" %}
+{% load static %}
+{% block titulo %}Entrar{% endblock %}
+{% block conteudo %}
+<form method="post" class="cartao-form">
+  {% csrf_token %}
+  <div class="logo-login">
+    <img class="logo logo-claro" src="{% static 'portal/logo.png' %}" alt="Aqquer">
+    <img class="logo logo-escuro" src="{% static 'portal/logo-escuro.png' %}" alt="Aqquer">
+  </div>
+  <h1>Entrar</h1>
+  <p class="sub">Use o usuário e a senha fornecidos pelo RH.</p>
+  {% if bloqueado %}
+    <p class="aviso erro">Muitas tentativas. Aguarde 15 minutos e tente novamente.</p>
+  {% elif form.errors %}
+    <p class="aviso erro">Usuário ou senha inválidos.</p>
+  {% endif %}
+  <label for="id_username">Usuário</label>
+  <input id="id_username" name="username" value="{{ form.username.value|default:'' }}" autocomplete="username" autofocus required>
+  <label for="id_password">Senha</label>
+  <input id="id_password" name="password" type="password" autocomplete="current-password" required>
+  <input type="hidden" name="next" value="{{ next }}">
+  <button class="btn btn-primario">Entrar</button>
+  <p><a href="{% url 'password_reset' %}">Esqueci minha senha</a></p>
+</form>
+{% endblock %}

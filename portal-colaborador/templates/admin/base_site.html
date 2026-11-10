@@ -1,0 +1,14 @@
+{% extends "admin/base_site.html" %}
+{% load static %}
+{% block extrastyle %}{{ block.super }}
+<style>
+#header{--header-bg:#fff;--header-color:#444;--header-link-color:#1a6fb8;--header-branding-color:#1a6fb8;border-bottom:1px solid #e3e3e3}
+#site-name a{display:block;width:150px;height:36px;font-size:0;color:transparent;background:url("{% static 'portal/logo.png' %}") left center/contain no-repeat}
+@media (prefers-color-scheme: dark){
+html:not([data-theme="light"]) #header{--header-bg:#1a1a1a;--header-color:#ccc;--header-link-color:#fff;--header-branding-color:#fff;border-bottom-color:#333}
+html:not([data-theme="light"]) #site-name a{background-image:url("{% static 'portal/logo-escuro.png' %}")}
+}
+html[data-theme="dark"] #header{--header-bg:#1a1a1a;--header-color:#ccc;--header-link-color:#fff;--header-branding-color:#fff;border-bottom-color:#333}
+html[data-theme="dark"] #site-name a{background-image:url("{% static 'portal/logo-escuro.png' %}")}
+</style>
+{% endblock %}

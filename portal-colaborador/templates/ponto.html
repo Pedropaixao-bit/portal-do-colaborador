@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block titulo %}Espelho de ponto{% endblock %}
+{% block conteudo %}
+<h1>Espelho de ponto</h1>
+<form method="get" class="filtros">
+  <input type="month" name="mes" value="{{ inicio|date:'Y-m' }}" aria-label="Mês">
+  <button class="btn">Pesquisar</button>
+  <a class="btn" href="?mes={{ anterior|date:'Y-m' }}">Mês anterior</a>
+  {% if tem_proximo %}<a class="btn" href="?mes={{ proximo|date:'Y-m' }}">Próximo mês</a>{% endif %}
+  <a class="btn" href="{% url 'espelhos_ponto' %}">Espelhos em PDF</a>
+</form>
+<p class="sub mes-titulo">{{ inicio|date:"F \d\e Y" }}</p>
+<div class="resumo">
+  <div><b>{{ total_trabalhado }}</b><span>Horas trabalhadas</span></div>
+  <div><b>{{ total_extras }}</b><span>Horas extras</span></div>
+  <div><b>{{ faltas }}</b><span>Faltas</span></div>
+  <div><b>{{ saldo }}</b><span>Saldo do banco de horas</span></div>
+</div>
+<div class="cartao">
+  <table>
+    <thead><tr><th>Dia</th><th>Batidas</th><th>Trabalhadas</th><th>Extras</th><th>Situação</th><th>Observação</th></tr></thead>
+    <tbody>
+    {% for r in registros %}
+      <tr>
+        <td>{{ r.data|date:"D d/m" }}</td>
+        <td>{{ r.batidas|default:"-" }}</td>
+        <td>{{ r.trabalhado }}</td>
+        <td>{{ r.extras }}</td>
+        <td>{% if r.falta %}<span class="chip chip-erro">Falta</span>{% elif r.batidas or r.minutos_trabalhados %}<span class="chip chip-ok">Presente</span>{% else %}<span class="chip">Sem batidas</span>{% endif %}</td>
+        <td>{{ r.observacao|default:"-" }}</td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="6" class="vazio">Nenhum registro de ponto neste mês.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

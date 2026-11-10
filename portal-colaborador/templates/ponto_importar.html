@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+{% block titulo %}Importar ponto{% endblock %}
+{% block conteudo %}
+<h1>Importar registros de ponto</h1>
+<p class="sub">Envie o relatório do ponto eletrônico (CSV ou XLSX). Cada linha precisa ter o CPF (ou a matrícula) e a data. Antes de gravar, você confere uma prévia. Colunas opcionais: Entrada/Saída, Horas trabalhadas, Horas extras, Falta, Saldo banco de horas e Observação. <a href="{% url 'ponto_modelo' %}">Baixar planilha modelo</a> | <a href="{% url 'admin:index' %}">Voltar ao admin</a></p>
+<form method="post" enctype="multipart/form-data" class="filtros">
+  {% csrf_token %}
+  <input type="file" name="arquivos" accept=".csv,.xlsx,.txt" multiple required aria-label="Relatório de ponto (CSV ou XLSX)">
+  <button class="btn btn-primario">{% if estado == "previa" %}Enviar outro relatório{% else %}Ver prévia{% endif %}</button>
+</form>
+{% if estado %}
+  {% if estado == "previa" %}
+    <p class="aviso{% if not ok %} erro{% endif %}"><strong>Prévia: nada foi gravado ainda.</strong> {{ ok }} dia(s) serão gravados ({{ novos }} novos e {{ atualizados }} atualizados){% if falhas %}; {{ falhas }} com erro serão ignorados{% endif %}.</p>
+  {% else %}
+    <p class="aviso{% if falhas and not ok %} erro{% endif %}">{{ ok }} dia(s) importado(s){% if falhas %}, {{ falhas }} com erro{% endif %}.</p>
+  {% endif %}
+  {% if ignoradas %}
+    <p class="aviso erro">Colunas lidas mas não gravadas, porque o cadastro de ponto não tem esse campo: {{ ignoradas|join:", " }}.</p>
+  {% endif %}
+  {% if resumo %}
+  <div class="cartao">
+    <table>
+      <thead><tr><th>Funcionário</th><th>Dias novos</th><th>Dias atualizados</th></tr></thead>
+      <tbody>
+      {% for colab, r in resumo %}
+        <tr><td>{{ colab }}</td><td>{{ r.novos }}</td><td>{{ r.atualizados }}</td></tr>
+      {% endfor %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% if estado == "previa" and token %}
+  <form method="post" class="filtros" style="margin-top:1rem">
+    {% csrf_token %}
+    <input type="hidden" name="confirmar" value="1">
+    <input type="hidden" name="token" value="{{ token }}">
+    <button class="btn btn-primario">Confirmar importação</button>
+    <a class="btn" href="{% url 'ponto_importar' %}">Cancelar</a>
+  </form>
+  {% endif %}
+  {% if arquivos_ruins or erros %}
+  <div class="cartao" style="margin-top:1rem">
+    <table>
+      <thead><tr><th>Arquivo</th><th>Linha</th><th>Motivo</th></tr></thead>
+      <tbody>
+      {% for a in arquivos_ruins %}
+        <tr><td>{{ a.arquivo }}</td><td>-</td><td>{{ a.detalhe }}</td></tr>
+      {% endfor %}
+      {% for e in erros %}
+        <tr><td>{{ e.arquivo }}</td><td>{{ e.linha }}</td><td>{{ e.detalhe }}</td></tr>
+      {% endfor %}
+      {% if erros_extras %}
+        <tr><td colspan="3" class="vazio">e mais {{ erros_extras }} linha(s) com erro.</td></tr>
+      {% endif %}
+      </tbody>
+    </table>
+  </div>
+  {% endif %}
+  {% if not resumo and not arquivos_ruins and not erros %}
+    <div class="cartao"><p class="vazio">Nenhuma linha de dados encontrada no relatório.</p></div>
+  {% endif %}
+{% endif %}
+{% endblock %}

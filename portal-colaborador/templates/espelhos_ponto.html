@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block titulo %}Espelho de ponto{% endblock %}
+{% block conteudo %}
+<h1>Espelho de ponto</h1>
+<p class="sub">Seus espelhos de ponto em PDF, por mês. <a href="{% url 'ponto' %}">Ver registros do mês</a></p>
+{% if anos|length > 1 %}
+<form method="get" class="filtros">
+  <select name="ano" aria-label="Ano" onchange="this.form.submit()">
+    <option value="">Todos os anos</option>
+    {% for a in anos %}<option value="{{ a }}"{% if ano == a|stringformat:"s" %} selected{% endif %}>{{ a }}</option>{% endfor %}
+  </select>
+  <noscript><button class="btn">Filtrar</button></noscript>
+</form>
+{% endif %}
+<div class="cartao">
+  <table>
+    <thead><tr><th>Mês</th><th></th></tr></thead>
+    <tbody>
+    {% for e in espelhos %}
+      <tr>
+        <td>{{ e.competencia|date:"F \d\e Y"|capfirst }}</td>
+        <td>
+          <a class="btn" href="{% url 'espelho_arquivo' e.pk %}" target="_blank" rel="noopener">Abrir</a>
+          <a class="btn" href="{% url 'espelho_arquivo' e.pk %}?baixar=1">Baixar</a>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="2" class="vazio">Nenhum espelho de ponto disponível.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}

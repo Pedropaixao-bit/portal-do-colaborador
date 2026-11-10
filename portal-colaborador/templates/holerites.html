@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block titulo %}Holerites{% endblock %}
+{% block conteudo %}
+<h1>Holerites</h1>
+<form method="get" class="filtros">
+  <select name="ano" aria-label="Ano">
+    <option value="">Todos os anos</option>
+    {% for a in anos %}<option value="{{ a }}"{% if ano == a|stringformat:"d" %} selected{% endif %}>{{ a }}</option>{% endfor %}
+  </select>
+  <select name="tipo" aria-label="Tipo">
+    <option value="">Todos os tipos</option>
+    {% for valor, nome in tipos %}<option value="{{ valor }}"{% if tipo == valor %} selected{% endif %}>{{ nome }}</option>{% endfor %}
+  </select>
+  <button class="btn">Pesquisar</button>
+</form>
+<div class="cartao">
+  <table>
+    <thead><tr><th>Competência</th><th>Tipo</th><th>Publicado em</th><th>Ações</th></tr></thead>
+    <tbody>
+    {% for h in holerites %}
+      <tr>
+        <td class="mes">{{ h.competencia|date:"F \d\e Y" }}</td>
+        <td><span class="chip">{{ h.get_tipo_display }}</span></td>
+        <td>{{ h.criado_em|date:"d/m/Y" }}</td>
+        <td>
+          <span class="acoes">
+            <a class="btn btn-icone" href="{% url 'holerite_arquivo' h.pk %}" target="_blank" rel="noopener" title="Ver" aria-label="Ver holerite"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M21 21l-4.3-4.3"/></svg></a>
+            <a class="btn btn-icone" href="{% url 'holerite_arquivo' h.pk %}?baixar=1" title="Baixar PDF" aria-label="Baixar PDF"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12"/><path d="M7 11l5 5 5-5"/><path d="M5 21h14"/></svg></a>
+          </span>
+        </td>
+      </tr>
+    {% empty %}
+      <tr><td colspan="4" class="vazio">Nenhum holerite encontrado.</td></tr>
+    {% endfor %}
+    </tbody>
+  </table>
+</div>
+{% endblock %}
